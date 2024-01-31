@@ -7,10 +7,14 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-  - task: AzureContainerApps@1
+  - task: AzureRmWebAppDeployment@4
     inputs:
-      appSourcePath: '$(Build.SourcesDirectory)/src'
-      azureSubscription: 'Azure for Students'
-      acrName: 'frontend'
-      containerAppName: 'task-maker'
-      resourceGroup: 'GR5MA23B'
+      ConnectionType: 'AzureRM'
+      azureSubscription: 'Azure for Students(c82dd837-5e13-427c-b590-13569d8ac5f7)'
+      appType: 'webAppContainer'
+      WebAppName: 'task-maker'
+      deployToSlotOrASE: true
+      ResourceGroupName: 'GR5MA23B'
+      SlotName: 'production'
+      DockerNamespace: 'gr5ma23b'
+      DockerRepository: 'frontend'
