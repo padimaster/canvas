@@ -12,8 +12,8 @@ pool:
    vmImage: 'ubuntu-latest' 
 
 variables:
-  imageName: 'frontend'
-  containerRegistry: 'gr5ma23b.azurecr.io'
+  imageName: 'gr5ma23b/frontend'
+  containerRegistry: 'gr5ma23b-padimaster'
   tag: 'latest'
 
 stages:
@@ -41,11 +41,6 @@ stages:
     pool:
       vmImage: ubuntu-latest
     steps:
-    - task: Docker@2
-      displayName: 'Login'
-      inputs:
-        containerRegistry: '$(containerRegistry)'
-        command: 'login'
     - task: Docker@2
       displayName: Push docker image
       inputs:
