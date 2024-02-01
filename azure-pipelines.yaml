@@ -26,4 +26,4 @@ stages:
         repository: 'frontend'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
-        tags: '$(Build.BuildId):latest'
+        tags: '$(Build.BuildId)'
