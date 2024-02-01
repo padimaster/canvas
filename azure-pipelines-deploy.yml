@@ -12,7 +12,7 @@ steps:
       ConnectionType: 'AzureRM'
       azureSubscription: 'Azure for Students(c82dd837-5e13-427c-b590-13569d8ac5f7)'
       appType: 'webAppContainer'
-      WebAppName: 'taskmaker'
+      WebAppName: 'task-maker'
       DockerNamespace: 'gr5ma23b.azurecr.io'
       DockerRepository: 'frontend'
       DockerImageTag: 'latest'
