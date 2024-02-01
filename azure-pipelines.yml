@@ -9,24 +9,32 @@ resources:
 - repo: self
 
 pool:
-   vmImage: 'ubuntu-latest' 
+   vmImage: 'ubuntu-latest'
+
+variables:
+  containerRegistry: 'gr5ma23b-padimaster'
+  dockerImage: 'frontend'
+  dockerfilePath: '$(**/Dockerfile)'
+  tags: 'latest'
 
 stages:
-- stage: BuildAndPush
-  displayName: Build docker image and push to container registry
+- stage: Delivery
+  displayName: Build docker image and push to azure container registry
   jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: ubuntu-latest
+  - job: BuildAndPush
     steps:
     - task: Docker@2
       inputs:
-        containerRegistry: 'gr5ma23b-padimaster'
-        repository: 'frontend'
+        containerRegistry: '$(containerRegistry)'
+        repository: '$(dockerImage)'
         command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
-        tags: 'latest'
+        Dockerfile: '$(dockerfilePath)'
+        tags: '$(tags)'
+- stage: Deploy
+  displayName: Deploy docker image from azure container registry into Web App Services instance
+  jobs:
+  - job: Deploy
+    steps:
     - task: AzureRmWebAppDeployment@4
       inputs:
         ConnectionType: 'AzureRM'
