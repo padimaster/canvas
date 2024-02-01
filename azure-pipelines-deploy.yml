@@ -12,9 +12,8 @@ steps:
       ConnectionType: 'AzureRM'
       azureSubscription: 'Azure for Students(c82dd837-5e13-427c-b590-13569d8ac5f7)'
       appType: 'webAppContainer'
-      WebAppName: 'task-maker'
-      deployToSlotOrASE: true
-      ResourceGroupName: 'GR5MA23B'
-      SlotName: 'production'
-      DockerNamespace: 'gr5ma23b'
+      WebAppName: 'taskmaker'
+      DockerNamespace: 'gr5ma23b.azurecr.io'
       DockerRepository: 'frontend'
+      DockerImageTag: 'latest'
+      AppSettings: '-Port 3000'
