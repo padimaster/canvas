@@ -12,7 +12,7 @@ pool:
    vmImage: 'ubuntu-latest' 
 
 stages:
-- stage: Build and Push
+- stage: BuildAndPush
   displayName: Build docker image and push to container registry
   jobs:
   - job: Build
