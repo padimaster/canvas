@@ -13,7 +13,8 @@ pool:
 
 variables:
   imageName: 'frontend'
-  tag: '$(Build.BuildId)'
+  containerRegistry: 'gr5ma23b.azurecr.io'
+  tag: 'latest'
 
 stages:
 - stage: Build
@@ -43,12 +44,12 @@ stages:
     - task: Docker@2
       displayName: 'Login'
       inputs:
-        containerRegistry: 'gr5ma23b'
+        containerRegistry: '$(containerRegistry)'
         command: 'login'
     - task: Docker@2
       displayName: Push docker image
       inputs:
-        containerRegistry: 'gr5ma23b'
+        containerRegistry: '$(containerRegistry)'
         repository: '$(imageName)'
         command: 'push'
         tags: |
