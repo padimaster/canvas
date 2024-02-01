@@ -8,12 +8,16 @@ trigger:
 resources:
 - repo: self
 
+pool:
+   vmImage: 'ubuntu-latest' 
+
 variables:
+  imageName: 'frontend'
   tag: '$(Build.BuildId)'
 
 stages:
 - stage: Build
-  displayName: Build image
+  displayName: Build docker image
   jobs:
   - job: Build
     displayName: Build
@@ -24,6 +28,28 @@ stages:
       displayName: Build an image
       inputs:
         command: build
+        repository: '$(imageName)'
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+        tags: |
+          $(tag)
+- stage: Push
+  displayName: Push to azure container registry
+  jobs:
+  - job: Push
+    displayName: Push
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: Docker@2
+      displayName: 'Login'
+      inputs:
+        containerRegistry: 'gr5ma23b'
+        command: 'login'
+    - task: Docker@2
+      displayName: Push docker image
+      inputs:
+        containerRegistry: 'gr5ma23b'
+        repository: '$(imageName)'
+        command: 'push'
         tags: |
           $(tag)
