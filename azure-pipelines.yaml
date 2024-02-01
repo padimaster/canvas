@@ -1,39 +1,39 @@
 # Docker
-# Build and push an image to Azure Container Registry
+# Build a Docker image
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-- develop
+- main
 
 resources:
 - repo: self
 
-variables:
-  # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '575fba7a-0706-4d62-a5a5-b1298d50a5b0'
-  imageRepository: 'frontend'
-  containerRegistry: 'gr5ma23b.azurecr.io'
-  dockerfilePath: '**/Dockerfile'
-  tag: '$(Build.BuildId)'
-
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+pool:
+   vmImage: 'ubuntu-latest' 
 
 stages:
-- stage: Build
-  displayName: Build and push stage
+- stage: BuildAndPush
+  displayName: Build docker image and push to container registry
   jobs:
   - job: Build
     displayName: Build
     pool:
-      vmImage: $(vmImageName)
+      vmImage: ubuntu-latest
     steps:
     - task: Docker@2
-      displayName: Build and push an image to container registry
       inputs:
-        command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+        containerRegistry: 'gr5ma23b-padimaster'
+        repository: 'frontend'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: 'latest'
+    - task: AzureRmWebAppDeployment@4
+      inputs:
+        ConnectionType: 'AzureRM'
+        azureSubscription: 'Azure for Students(c82dd837-5e13-427c-b590-13569d8ac5f7)'
+        appType: 'webAppContainer'
+        WebAppName: 'task-maker'
+        DockerNamespace: 'gr5ma23b.azurecr.io'
+        DockerRepository: 'frontend'
+        DockerImageTag: 'latest'
+        AppSettings: '-Port 3000'
