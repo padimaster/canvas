@@ -3,13 +3,13 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-- main
+  - main
 
 resources:
-- repo: self
+  - repo: self
 
 pool:
-   vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-latest'
 
 variables:
   containerRegistry: 'gr5ma23b-padimaster'
@@ -18,30 +18,30 @@ variables:
   tags: 'latest'
 
 stages:
-- stage: Delivery
-  displayName: Build docker image and push to azure container registry
-  jobs:
-  - job: BuildAndPush
-    steps:
-    - task: Docker@2
-      inputs:
-        containerRegistry: '$(containerRegistry)'
-        repository: '$(dockerImage)'
-        command: 'buildAndPush'
-        Dockerfile: '$(dockerfilePath)'
-        tags: '$(tags)'
-- stage: Deploy
-  displayName: Deploy docker image from azure container registry into Web App Services instance
-  jobs:
-  - job: Deploy
-    steps:
-    - task: AzureRmWebAppDeployment@4
-      inputs:
-        ConnectionType: 'AzureRM'
-        azureSubscription: 'Azure for Students(c82dd837-5e13-427c-b590-13569d8ac5f7)'
-        appType: 'webAppContainer'
-        WebAppName: 'task-maker'
-        DockerNamespace: 'gr5ma23b.azurecr.io'
-        DockerRepository: 'frontend'
-        DockerImageTag: 'latest'
-        AppSettings: '-Port 3000'
+  - stage: Delivery
+    displayName: Build docker image and push to azure container registry
+    jobs:
+      - job: BuildAndPush
+        steps:
+          - task: Docker@2
+            inputs:
+              containerRegistry: '$(containerRegistry)'
+              repository: '$(dockerImage)'
+              command: 'buildAndPush'
+              Dockerfile: '$(dockerfilePath)'
+              tags: '$(tags)'
+  - stage: Deploy
+    displayName: Deploy docker image from azure container registry into Web App Services instance
+    jobs:
+      - job: Deploy
+        steps:
+          - task: AzureRmWebAppDeployment@4
+            inputs:
+              ConnectionType: 'AzureRM'
+              azureSubscription: 'Azure for Students(c82dd837-5e13-427c-b590-13569d8ac5f7)'
+              appType: 'webAppContainer'
+              WebAppName: 'task-maker'
+              DockerNamespace: 'gr5ma23b.azurecr.io'
+              DockerRepository: 'frontend'
+              DockerImageTag: 'latest'
+              AppSettings: '-Port 3000'
