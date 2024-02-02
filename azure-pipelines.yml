@@ -16,7 +16,7 @@ variables:
   containerRegistry: 'gr5ma23b-padimaster'
   dockerImage: 'frontend'
   dockerfilePath: '**/Dockerfile'
-  tags: 'latest'
+  tags: '$(Build.BuildId)'
   webAppName: 'task-maker'
 
 stages:
