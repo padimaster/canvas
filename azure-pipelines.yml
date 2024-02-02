@@ -12,10 +12,12 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
+  dockerNamespace: 'gr5ma23b.azurecr.io'
   containerRegistry: 'gr5ma23b-padimaster'
   dockerImage: 'frontend'
-  dockerfilePath: '$(**/Dockerfile)'
+  dockerfilePath: '**/Dockerfile'
   tags: 'latest'
+  webAppName: 'task-maker'
 
 stages:
   - stage: Delivery
@@ -40,8 +42,8 @@ stages:
               ConnectionType: 'AzureRM'
               azureSubscription: 'Azure for Students(c82dd837-5e13-427c-b590-13569d8ac5f7)'
               appType: 'webAppContainer'
-              WebAppName: 'task-maker'
-              DockerNamespace: 'gr5ma23b.azurecr.io'
-              DockerRepository: 'frontend'
-              DockerImageTag: 'latest'
+              WebAppName: '$(webAppName)'
+              DockerNamespace: '$(dockerNamespace)'
+              DockerRepository: '$(dockerImage)'
+              DockerImageTag: '$(tags)'
               AppSettings: '-Port 3000'
