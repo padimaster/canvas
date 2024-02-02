@@ -1,1 +1,1 @@
-export * from './canvas.type';
+export * from './canvas.types';
