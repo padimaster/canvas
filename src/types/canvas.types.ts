@@ -142,7 +142,6 @@ export type LayerProps = {
   type: LAYER_TYPE;
   x: number;
   y: number;
-  color: Color;
   height: number;
   width: number;
   fill: Color;

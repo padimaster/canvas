@@ -11,7 +11,7 @@ import {
   Point,
 } from '@/types';
 
-import useLayer from '@/hooks/useLayer';
+import useLayer from '@/hooks/use-layer.hook';
 import { pointerEventToCanvasPoint } from '@/lib/utils';
 import { useCallback, useState } from 'react';
 import Info from './info.component';
@@ -19,13 +19,9 @@ import { LayerPreview } from './layer';
 import Participants from './participants.component';
 import Toolbar from './tools/toolbar.component';
 
-type Props = {
-  boardId: string;
-};
-
 const MAX_LAYERS = 100;
 
-export default function Canvas({ boardId }: Props) {
+export default function Canvas() {
   const [canvasState, setCanvasState] = useState<CanvasState>({
     mode: CANVAS_MODE.NONE,
   });
@@ -82,7 +78,9 @@ export default function Canvas({ boardId }: Props) {
 
   const onPointerUp: React.PointerEventHandler<SVGSVGElement> = (event) => {
     const point = pointerEventToCanvasPoint(event, camera);
+    console.log('Pointer up at:', point);
     if (canvasState.mode === CANVAS_MODE.INSERTING) {
+      console.log('Inserting layer');
       insertLayer(canvasState.layerType, point);
     } else {
       setCanvasState({ mode: CANVAS_MODE.NONE });
@@ -106,6 +104,7 @@ export default function Canvas({ boardId }: Props) {
         onWheel={onWheel}
         onPointerUp={onPointerUp}
         onPointerMove={onPointerMove}
+        data-testid="layers-container"
       >
         <g
           style={{
@@ -116,8 +115,9 @@ export default function Canvas({ boardId }: Props) {
             <LayerPreview
               key={layerId}
               id={layerId}
+              layer={layers[layerId]}
               onLayerPointerDown={() => {}}
-              selectionColor={'#0000'}
+              selectionColor={'#000'}
             />
           ))}
         </g>

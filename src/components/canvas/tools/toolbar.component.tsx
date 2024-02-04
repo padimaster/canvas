@@ -85,6 +85,7 @@ export default function Toolbar({
             canvasState.mode == CANVAS_MODE.INSERTING &&
             canvasState.layerType === LAYER_TYPE.RECTANGLE
           }
+          data-testid="rectangle-tool-button"
         />
         <ToolButton
           label="Ellipse"

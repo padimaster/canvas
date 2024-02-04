@@ -31,7 +31,7 @@ export default function Rectangle({
       width={width}
       height={height}
       strokeWidth={1}
-      fill={'#0000'}
+      fill={'#000'}
       stroke="transparent"
     >
       Rectangle

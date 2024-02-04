@@ -6,7 +6,6 @@ const useLayer = () => {
 
   const getLayersID = () => {
     const layersId = Object.keys(layers);
-    console.log(layersId);
     return layersId;
   };
 
@@ -16,11 +15,13 @@ const useLayer = () => {
   };
 
   const addLayer = (layerId: string, layer: LayerProps) => {
-    console.log(layers);
-    setLayers((prevLayers) => ({
-      ...prevLayers,
-      [layerId]: layer,
-    }));
+    setLayers((prevLayers) => {
+      const updatedLayers = {
+        ...prevLayers,
+        [layerId]: layer,
+      };
+      return updatedLayers;
+    });
   };
 
   return {

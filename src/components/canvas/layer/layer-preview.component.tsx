@@ -1,33 +1,22 @@
 'use client';
 
-import useLayer from '@/hooks/useLayer';
-import { LAYER_TYPE, RectangleLayer } from '@/types';
+import { LAYER_TYPE, LayerProps, RectangleLayer } from '@/types';
 import { memo } from 'react';
 import Rectangle from './rectangle-layer.component';
 
 type Props = {
   id: string;
+  layer: LayerProps;
   onLayerPointerDown: (e: React.PointerEvent, layerId: string) => void;
   selectionColor?: string;
 };
 
-const LayerPreview = memo(function LayerPreview({
+function LayerPreview({
   id,
+  layer,
   onLayerPointerDown,
   selectionColor,
 }: Props) {
-  console.log('LayerPreview component rendered!');
-  const { getLayerById, layers } = useLayer();
-
-  if (!id) {
-    return null;
-  }
-
-  console.log('ID:', id);
-  const layer = getLayerById(id);
-  console.log(layer);
-  console.log(layers);
-
   if (!layer) {
     return null;
   }
@@ -51,8 +40,10 @@ const LayerPreview = memo(function LayerPreview({
       console.warn('Unknown layer type');
       return null;
   }
-});
+}
 
-LayerPreview.displayName = 'LayerPreview';
+const MemoLayerPreview = memo(LayerPreview);
 
-export default LayerPreview;
+MemoLayerPreview.displayName = 'LayerPreview';
+
+export default MemoLayerPreview;
