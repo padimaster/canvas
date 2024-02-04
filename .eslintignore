@@ -1,0 +1,10 @@
+.next
+next-env.d.ts
+node_modules
+yarn.lock
+pnpm-lock.yaml
+public
+postcss.config.js
+next.config.js
+jest.setup.js
+jest.config.js
