@@ -44,7 +44,7 @@ export type EllipseLayer = {
   value?: string;
 };
 
-export type PathLayer = {
+export type PathLayerProps = {
   type: LAYER_TYPE.PATH;
   x: number;
   y: number;
@@ -143,12 +143,13 @@ export type Layer =
   | StickyNoteLayer
   | RectangleLayer
   | EllipseLayer
-  | PathLayer;
+  | PathLayerProps;
 
 export type LayerProps = {
   type: LAYER_TYPE;
   x: number;
   y: number;
+  points?: number[][] | undefined;
   height: number;
   width: number;
   fill: Color;

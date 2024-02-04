@@ -1,4 +1,13 @@
-import { CANVAS_MODE, Camera, Color, Point, SIDE, XYWH } from '@/types';
+import {
+  CANVAS_MODE,
+  Camera,
+  Color,
+  LAYER_TYPE,
+  PathLayerProps as PathLayer,
+  Point,
+  SIDE,
+  XYWH,
+} from '@/types';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -57,4 +66,63 @@ export function resizeBounds(bounds: XYWH, corner: SIDE, point: Point): XYWH {
   }
 
   return result;
+}
+
+export function pencilPointsTuPathLayer(
+  points: number[][],
+  color: Color
+): PathLayer {
+  if (points.length < 2) {
+    throw new Error('At least two points are required to create a path');
+  }
+  let left = Number.POSITIVE_INFINITY;
+  let right = Number.NEGATIVE_INFINITY;
+  let top = Number.POSITIVE_INFINITY;
+  let bottom = Number.NEGATIVE_INFINITY;
+
+  for (const point of points) {
+    const [x, y] = point;
+
+    if (x < left) {
+      left = x;
+    }
+
+    if (x > right) {
+      right = x;
+    }
+
+    if (y < top) {
+      top = y;
+    }
+
+    if (y > bottom) {
+      bottom = y;
+    }
+  }
+
+  return {
+    type: LAYER_TYPE.PATH,
+    x: left,
+    y: top,
+    width: right - left,
+    height: bottom - top,
+    fill: color,
+    points: points.map(([x, y, preassure]) => [x - left, y - top, preassure]),
+  };
+}
+
+export function getSvgPathFromStroke(stroke: number[][]) {
+  if (!stroke.length) return '';
+
+  const d = stroke.reduce(
+    (acc, [x0, y0], i, arr) => {
+      const [x1, y1] = arr[(i + 1) % arr.length];
+      acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
+      return acc;
+    },
+    ['M', ...stroke[0], 'Q']
+  );
+
+  d.push('Z');
+  return d.join(' ');
 }

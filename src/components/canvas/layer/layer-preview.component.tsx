@@ -1,9 +1,15 @@
 'use client';
 
 import { LayersContext } from '@/providers/layer.provider';
-import { EllipseLayer, LAYER_TYPE, RectangleLayer } from '@/types';
+import {
+  EllipseLayer,
+  LAYER_TYPE,
+  PathLayerProps as PathLayer,
+  RectangleLayer,
+} from '@/types';
 import { memo, useContext } from 'react';
 import Ellipse from './ellipse-layer.component';
+import Path from './path-layer.component';
 import Rectangle from './rectangle-layer.component';
 
 type Props = {
@@ -20,6 +26,16 @@ function LayerPreview({ id, onLayerPointerDown, selectionColor }: Props) {
     return null;
   }
   switch (layer.type) {
+    case LAYER_TYPE.PATH:
+      return (
+        <Path
+          key={id}
+          points={layer.points ?? []}
+          layer={layer as PathLayer}
+          onPointerDown={(e) => onLayerPointerDown(e, id)}
+          selectionColor={selectionColor}
+        />
+      );
     case LAYER_TYPE.RECTANGLE:
       return (
         <Rectangle
