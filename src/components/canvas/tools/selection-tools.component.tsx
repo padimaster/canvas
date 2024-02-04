@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { getSelectionBounds } from '@/lib/selection.lib';
 import { LayersContext } from '@/providers/layer.provider';
 import { Camera, Color } from '@/types';
-import { Trash2 } from 'lucide-react';
+import { BringToFront, SendToBack, Trash2 } from 'lucide-react';
 import { Hint } from '../hint.component';
 import ColorPicker from './color-picker.component';
 
@@ -42,17 +42,39 @@ function SelectionTools({ camera, setLastUsedColor }: Props) {
 
   const deleteLayers = () => {
     for (const layerId of selection) {
+      const layer = layers[layerId];
+      setLayers((prev) => ({ ...prev, [layerId]: layer }));
+    }
+  };
+
+  const moveToBack = () => {
+    for (const layerId of selection) {
       setLayers((prev) => {
+        return {
+          [layerId]: prev[layerId],
+          ...prev,
+        };
+      });
+    }
+  };
+
+  const moveToFront = () => {
+    for (const layerId of selection) {
+      setLayers((prev) => {
+        const layer = prev[layerId];
         const next = { ...prev };
         delete next[layerId];
-        return next;
+        return {
+          ...next,
+          [layerId]: layer,
+        };
       });
     }
   };
 
   return (
     <div
-      className="absolute p-3 rounded-xl shadow-sm border flex select-none bg-gray-200"
+      className="absolute p-3 rounded-xl shadow-sm border flex select-none bg-gray-200 gap-2"
       style={{
         transform: `translate(
             calc(${x}px - 50%),
@@ -61,7 +83,19 @@ function SelectionTools({ camera, setLastUsedColor }: Props) {
       }}
     >
       <ColorPicker onChange={setFill} />
-      <div className="flex items-center border-l border-neutral-200">
+      <div className="flex flex-col gap-y-0.5 pl-2 border border-1 border-l-gray-500">
+        <Hint label="Brint to front">
+          <Button variant={'board'} size={'icon'} onClick={moveToFront}>
+            <BringToFront />
+          </Button>
+        </Hint>
+        <Hint label="Send to back" side={'bottom'}>
+          <Button variant={'board'} size={'icon'} onClick={moveToBack}>
+            <SendToBack />
+          </Button>
+        </Hint>
+      </div>
+      <div className="flex items-center pl-2 border border-1 border-l-gray-500">
         <Hint label="Delete">
           <Button
             size={'icon'}

@@ -26,7 +26,7 @@ type Props = {
 
 export default function ColorPicker({ onChange }: Props) {
   return (
-    <div className="flex flex-wrap gap-2 items-center max-w-[164px] pr-2 mr-2 border-r border-gray-700 ">
+    <div className="flex flex-wrap gap-2 items-center max-w-[164px]">
       <ColorButton color={{ r: 243, g: 82, b: 35 }} onClick={onChange} />
       <ColorButton color={{ r: 255, g: 249, b: 177 }} onClick={onChange} />
       <ColorButton color={{ r: 68, g: 202, b: 99 }} onClick={onChange} />
