@@ -8,10 +8,10 @@ type Props = {
 };
 
 export default async function BoardPage({ params: { boardId } }: Props) {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  await new Promise((resolve) => setTimeout(resolve, 500));
   return (
     <BoardPageLayout>
-      <Canvas boardId={boardId}></Canvas>
+      <Canvas></Canvas>
     </BoardPageLayout>
   );
 }
