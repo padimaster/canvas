@@ -24,6 +24,7 @@ import { useCallback, useState } from 'react';
 import Info from './info.component';
 import { LayerPreview, SelectionBox } from './layer';
 import Participants from './participants.component';
+import { SelectionTools } from './tools';
 import Toolbar from './tools/toolbar.component';
 
 const MAX_LAYERS = 100;
@@ -238,6 +239,10 @@ export default function Canvas() {
           redo={() => {}}
           undo={() => {}}
         />
+        <SelectionTools
+          camera={camera}
+          setLastUsedColor={setLastUsedColor}
+        ></SelectionTools>
         <svg
           className="h-[100vh] w-[100vw]"
           onWheel={onWheel}

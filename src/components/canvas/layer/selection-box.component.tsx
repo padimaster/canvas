@@ -1,6 +1,6 @@
 'use client';
 
-import { getSelectionBounds } from '@/hooks/use-selection-bounds.hook';
+import { getSelectionBounds } from '@/lib/selection.lib';
 import { LayersContext } from '@/providers/layer.provider';
 import { SIDE, XYWH } from '@/types';
 import { memo, useContext } from 'react';
