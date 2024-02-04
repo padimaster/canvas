@@ -9,14 +9,16 @@ import {
   Color,
   LAYER_TYPE,
   Point,
+  SIDE,
+  XYWH,
 } from '@/types';
 
-import useLayer from '@/hooks/use-layer.hook';
 import {
   colorToCSS,
   isSelectionMode,
   pointerEventToCanvasPoint,
 } from '@/lib/utils';
+import { LayersProvider } from '@/providers/layer.provider';
 import { useCallback, useState } from 'react';
 import Info from './info.component';
 import { LayerPreview, SelectionBox } from './layer';
@@ -30,9 +32,10 @@ export default function Canvas() {
     mode: CANVAS_MODE.NONE,
   });
 
-  const { layers, getLayersID, addLayer, selection, setSelection } = useLayer();
+  const [layers, setLayers] = useState<Record<string, any>>({});
+  const [selection, setSelection] = useState<string[]>([]);
 
-  const layersId = getLayersID();
+  const layersId = Object.keys(layers);
 
   const [camera, setCamera] = useState<Camera>({ x: 0, y: 0 });
   const [lastUsedColor, setLastUsedColor] = useState<Color>({
@@ -59,12 +62,14 @@ export default function Canvas() {
       fill: lastUsedColor,
     };
 
-    addLayer(layerId, layer);
-    console.log('Layer added');
-    console.log({
-      layerId,
-      layer,
-    });
+    console.log('Before setLayers:', layers);
+
+    setLayers((prevLayers) => ({
+      ...prevLayers,
+      [layerId]: layer,
+    }));
+
+    console.log('After setLayers:', layers);
   };
 
   const onWheel = useCallback((e: React.WheelEvent) => {
@@ -82,7 +87,6 @@ export default function Canvas() {
 
   const onPointerUp: React.PointerEventHandler<SVGSVGElement> = (event) => {
     const point = pointerEventToCanvasPoint(event, camera);
-    console.log('Pointer up at:', point);
     if (canvasState.mode === CANVAS_MODE.INSERTING) {
       console.log('Inserting layer');
       insertLayer(canvasState.layerType, point);
@@ -123,42 +127,56 @@ export default function Canvas() {
     }
   };
 
+  const onResizeHandlerPointerDown = useCallback(
+    (corner: SIDE, initialBounds: XYWH) => {
+      setCanvasState({
+        mode: CANVAS_MODE.RESIZING,
+        corner,
+        initialBounds,
+      });
+    },
+    []
+  );
+
   return (
-    <div className="w-full h-full relative bg-neutral-100 touch-none">
-      <Info />
-      <Participants />
-      <Toolbar
-        canvasState={canvasState}
-        setCanvasState={setCanvasState}
-        canRedo={false}
-        canUndo={false}
-        redo={() => {}}
-        undo={() => {}}
-      />
-      <svg
-        className="h-[100vh] w-[100vw]"
-        onWheel={onWheel}
-        onPointerUp={onPointerUp}
-        onPointerMove={onPointerMove}
-        data-testid="layers-container"
-      >
-        <g
-          style={{
-            transform: `translate(${camera.x}px, ${camera.y}px)`,
-          }}
+    <LayersProvider value={{ layers, setLayers, selection, setSelection }}>
+      <div className="w-full h-full relative bg-neutral-100 touch-none">
+        <Info />
+        <Participants />
+        <Toolbar
+          canvasState={canvasState}
+          setCanvasState={setCanvasState}
+          canRedo={false}
+          canUndo={false}
+          redo={() => {}}
+          undo={() => {}}
+        />
+        <svg
+          className="h-[100vh] w-[100vw]"
+          onWheel={onWheel}
+          onPointerUp={onPointerUp}
+          onPointerMove={onPointerMove}
+          data-testid="layers-container"
         >
-          {layersId.map((layerId) => (
-            <LayerPreview
-              key={layerId}
-              id={layerId}
-              layer={layers[layerId]}
-              onLayerPointerDown={onLayerPointerDown}
-              selectionColor={layersToColors(layerId)}
+          <g
+            style={{
+              transform: `translate(${camera.x}px, ${camera.y}px)`,
+            }}
+          >
+            {layersId.map((layerId) => (
+              <LayerPreview
+                key={layerId}
+                id={layerId}
+                onLayerPointerDown={onLayerPointerDown}
+                selectionColor={layersToColors(layerId)}
+              />
+            ))}
+            <SelectionBox
+              onResizeHandlerPointerDown={onResizeHandlerPointerDown}
             />
-          ))}
-          <SelectionBox onResizeHandlerPointerDown={() => {}} />
-        </g>
-      </svg>
-    </div>
+          </g>
+        </svg>
+      </div>
+    </LayersProvider>
   );
 }

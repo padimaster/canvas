@@ -1,8 +1,9 @@
 'use client';
 
-import { useSelectionBounds } from '@/hooks/use-selection-bounds.hook';
+import { getSelectionBounds } from '@/hooks/use-selection-bounds.hook';
+import { LayersContext } from '@/providers/layer.provider';
 import { SIDE, XYWH } from '@/types';
-import { memo } from 'react';
+import { memo, useContext } from 'react';
 
 type Props = {
   onResizeHandlerPointerDown: (corner: SIDE, initialBounds: XYWH) => void;
@@ -12,8 +13,9 @@ const HANDLE_WIDTH = 8;
 
 function SelectionBox({ onResizeHandlerPointerDown }: Props) {
   const isShowingHandles = true;
+  const { selection, layers } = useContext(LayersContext);
 
-  const bounds = useSelectionBounds();
+  const bounds = getSelectionBounds(selection, layers);
   if (!bounds) return null;
   return (
     <>

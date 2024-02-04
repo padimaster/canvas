@@ -1,27 +1,28 @@
 'use client';
 
-import { LAYER_TYPE, LayerProps, RectangleLayer } from '@/types';
-import { memo } from 'react';
+import { LayersContext } from '@/providers/layer.provider';
+import { LAYER_TYPE, RectangleLayer } from '@/types';
+import { memo, useContext } from 'react';
 import Rectangle from './rectangle-layer.component';
 
 type Props = {
   id: string;
-  layer: LayerProps;
   onLayerPointerDown: (e: React.PointerEvent, layerId: string) => void;
   selectionColor?: string;
 };
 
-function LayerPreview({
-  id,
-  layer,
-  onLayerPointerDown,
-  selectionColor,
-}: Props) {
+function LayerPreview({ id, onLayerPointerDown, selectionColor }: Props) {
+  const { layers } = useContext(LayersContext);
+  console.log('LayerPreview component rendered!');
+  console.log(layers);
+  const layer = layers[id];
+
   if (!layer) {
     return null;
   }
   switch (layer.type) {
     case LAYER_TYPE.RECTANGLE:
+      console.log('RectangleLayer component rendered!');
       return (
         <Rectangle
           id={id}
