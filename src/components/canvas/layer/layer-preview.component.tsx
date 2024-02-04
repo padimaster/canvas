@@ -13,8 +13,6 @@ type Props = {
 
 function LayerPreview({ id, onLayerPointerDown, selectionColor }: Props) {
   const { layers } = useContext(LayersContext);
-  console.log('LayerPreview component rendered!');
-  console.log(layers);
   const layer = layers[id];
 
   if (!layer) {
@@ -22,7 +20,6 @@ function LayerPreview({ id, onLayerPointerDown, selectionColor }: Props) {
   }
   switch (layer.type) {
     case LAYER_TYPE.RECTANGLE:
-      console.log('RectangleLayer component rendered!');
       return (
         <Rectangle
           id={id}

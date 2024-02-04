@@ -17,8 +17,6 @@ export default function Rectangle({
   onPointerDown,
   selectionColor,
 }: Props) {
-  console.log(layer);
-  console.log('RectangleLayer component rendered!');
   const { x, y, width, height, fill } = layer;
   return (
     <rect

@@ -17,6 +17,7 @@ import {
   colorToCSS,
   isSelectionMode,
   pointerEventToCanvasPoint,
+  resizeBounds,
 } from '@/lib/utils';
 import { LayersProvider } from '@/providers/layer.provider';
 import { useCallback, useState } from 'react';
@@ -83,6 +84,10 @@ export default function Canvas() {
     event.preventDefault();
 
     const current = pointerEventToCanvasPoint(event, camera);
+
+    if (CANVAS_MODE.RESIZING) {
+      resizeSelectedLayer(current);
+    }
   };
 
   const onPointerUp: React.PointerEventHandler<SVGSVGElement> = (event) => {
@@ -137,6 +142,32 @@ export default function Canvas() {
     },
     []
   );
+
+  const resizeSelectedLayer = (point: Point) => {
+    if (canvasState.mode !== CANVAS_MODE.RESIZING) {
+      return;
+    }
+
+    const bounds = resizeBounds(
+      canvasState.initialBounds,
+      canvasState.corner,
+      point
+    );
+
+    const selectedLayer = layers[selection[0]];
+
+    if (!selectedLayer) {
+      return;
+    }
+
+    setLayers((prevLayers) => ({
+      ...prevLayers,
+      [selection[0]]: {
+        ...selectedLayer,
+        ...bounds,
+      },
+    }));
+  };
 
   return (
     <LayersProvider value={{ layers, setLayers, selection, setSelection }}>
