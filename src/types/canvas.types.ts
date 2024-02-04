@@ -27,6 +27,13 @@ export type RectangleLayer = {
   value?: string;
 };
 
+export type SelectionMode =
+  | CANVAS_MODE.NONE
+  | CANVAS_MODE.TRASLATING
+  | CANVAS_MODE.RESIZING
+  | CANVAS_MODE.SELECTION_NET
+  | CANVAS_MODE.PRESSING;
+
 export type EllipseLayer = {
   type: LAYER_TYPE.ELLIPSE;
   x: number;
@@ -83,7 +90,7 @@ export type XYWH = {
 export enum SIDE {
   TOP = 1,
   BOTTOM = 2,
-  LEFT4,
+  LEFT = 4,
   RIGHT = 8,
 }
 

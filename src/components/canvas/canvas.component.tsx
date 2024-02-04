@@ -19,7 +19,7 @@ import {
 } from '@/lib/utils';
 import { useCallback, useState } from 'react';
 import Info from './info.component';
-import { LayerPreview } from './layer';
+import { LayerPreview, SelectionBox } from './layer';
 import Participants from './participants.component';
 import Toolbar from './tools/toolbar.component';
 
@@ -156,6 +156,7 @@ export default function Canvas() {
               selectionColor={layersToColors(layerId)}
             />
           ))}
+          <SelectionBox onResizeHandlerPointerDown={() => {}} />
         </g>
       </svg>
     </div>
