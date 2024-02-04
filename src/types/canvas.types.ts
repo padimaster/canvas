@@ -10,11 +10,11 @@ export type Camera = {
 };
 
 export enum LAYER_TYPE {
-  RECTANGLE,
-  ELLIPSE,
-  PATH,
   TEXT,
+  ELLIPSE,
   STICKY_NOTE,
+  RECTANGLE,
+  PATH,
 }
 
 export type RectangleLayer = {
@@ -58,7 +58,7 @@ export type TextLayer = {
   value?: string;
 };
 
-export type NoteLayer = {
+export type StickyNoteLayer = {
   type: LAYER_TYPE.TEXT;
   x: number;
   y: number;
@@ -130,3 +130,20 @@ export enum CANVAS_MODE {
   RESIZING,
   DRAWING,
 }
+
+export type Layer =
+  | TextLayer
+  | StickyNoteLayer
+  | RectangleLayer
+  | EllipseLayer
+  | PathLayer;
+
+export type LayerProps = {
+  type: LAYER_TYPE;
+  x: number;
+  y: number;
+  color: Color;
+  height: number;
+  width: number;
+  fill: Color;
+};

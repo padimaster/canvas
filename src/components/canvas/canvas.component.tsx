@@ -1,9 +1,21 @@
 'use client';
 
-import { CANVAS_MODE, CanvasState } from '@/types';
+import { nanoid } from 'nanoid';
 
-import { useState } from 'react';
+import {
+  CANVAS_MODE,
+  Camera,
+  CanvasState,
+  Color,
+  LAYER_TYPE,
+  Point,
+} from '@/types';
+
+import useLayer from '@/hooks/useLayer';
+import { pointerEventToCanvasPoint } from '@/lib/utils';
+import { useCallback, useState } from 'react';
 import Info from './info.component';
+import { LayerPreview } from './layer';
 import Participants from './participants.component';
 import Toolbar from './tools/toolbar.component';
 
@@ -11,12 +23,71 @@ type Props = {
   boardId: string;
 };
 
+const MAX_LAYERS = 100;
+
 export default function Canvas({ boardId }: Props) {
   const [canvasState, setCanvasState] = useState<CanvasState>({
-    mode: CANVAS_MODE.SELECT,
+    mode: CANVAS_MODE.NONE,
   });
 
-  const history = [];
+  const { layers, getLayersID, addLayer } = useLayer();
+
+  const layersId = getLayersID();
+
+  const [camera, setCamera] = useState<Camera>({ x: 0, y: 0 });
+  const [lastUsedColor, setLastUsedColor] = useState<Color>({
+    r: 0,
+    g: 0,
+    b: 0,
+  });
+
+  const insertLayer = (layerType: LAYER_TYPE, position: Point) => {
+    const layersSize = Object.keys(layers).length;
+    if (layersSize >= MAX_LAYERS) {
+      return;
+    }
+
+    const layerId = nanoid();
+
+    const layer = {
+      type: layerType,
+      x: position.x,
+      y: position.y,
+      color: lastUsedColor,
+      height: 100,
+      width: 100,
+      fill: lastUsedColor,
+    };
+
+    addLayer(layerId, layer);
+    console.log('Layer added');
+    console.log({
+      layerId,
+      layer,
+    });
+  };
+
+  const onWheel = useCallback((e: React.WheelEvent) => {
+    setCamera((camera) => ({
+      x: camera.x - e.deltaX,
+      y: camera.y - e.deltaY,
+    }));
+  }, []);
+
+  const onPointerMove = (event: React.PointerEvent<SVGSVGElement>) => {
+    event.preventDefault();
+
+    const current = pointerEventToCanvasPoint(event, camera);
+  };
+
+  const onPointerUp: React.PointerEventHandler<SVGSVGElement> = (event) => {
+    const point = pointerEventToCanvasPoint(event, camera);
+    if (canvasState.mode === CANVAS_MODE.INSERTING) {
+      insertLayer(canvasState.layerType, point);
+    } else {
+      setCanvasState({ mode: CANVAS_MODE.NONE });
+    }
+  };
 
   return (
     <div className="w-full h-full relative bg-neutral-100 touch-none">
@@ -30,6 +101,27 @@ export default function Canvas({ boardId }: Props) {
         redo={() => {}}
         undo={() => {}}
       />
+      <svg
+        className="h-[100vh] w-[100vw]"
+        onWheel={onWheel}
+        onPointerUp={onPointerUp}
+        onPointerMove={onPointerMove}
+      >
+        <g
+          style={{
+            transform: `translate(${camera.x}px, ${camera.y}px)`,
+          }}
+        >
+          {layersId.map((layerId) => (
+            <LayerPreview
+              key={layerId}
+              id={layerId}
+              onLayerPointerDown={() => {}}
+              selectionColor={'#0000'}
+            />
+          ))}
+        </g>
+      </svg>
     </div>
   );
 }
