@@ -1,4 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton';
+import { isSelectionMode } from '@/lib/utils';
 import { CANVAS_MODE, CanvasState, LAYER_TYPE } from '@/types';
 import {
   Circle,
@@ -36,13 +37,7 @@ export default function Toolbar({
           label="Select"
           icon={MousePointer2}
           onClick={() => setCanvasState({ mode: CANVAS_MODE.NONE })}
-          isActive={
-            canvasState.mode === CANVAS_MODE.NONE ||
-            canvasState.mode === CANVAS_MODE.TRASLATING ||
-            canvasState.mode === CANVAS_MODE.RESIZING ||
-            canvasState.mode === CANVAS_MODE.SELECTION_NET ||
-            canvasState.mode === CANVAS_MODE.PRESSING
-          }
+          isActive={isSelectionMode(canvasState.mode)}
         />
         <ToolButton
           label="Text"

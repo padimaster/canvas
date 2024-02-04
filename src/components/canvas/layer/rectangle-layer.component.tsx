@@ -1,11 +1,12 @@
+import { colorToCSS } from '@/lib/utils';
 import { RectangleLayer } from '@/types';
 
 type Props = {
   id: string;
   layer: RectangleLayer;
   onPointerDown: (
-    e: React.PointerEvent<SVGRectElement>,
-    layerId: string
+    _e: React.PointerEvent<SVGRectElement>,
+    _layerId: string // Prefix the unused argument with an underscore (_)
   ) => void;
   selectionColor?: string;
 };
@@ -30,9 +31,9 @@ export default function Rectangle({
       y={0}
       width={width}
       height={height}
-      strokeWidth={1}
-      fill={'#000'}
-      stroke="transparent"
+      strokeWidth={2}
+      fill={fill ? colorToCSS(fill) : '#000'}
+      stroke={selectionColor || 'transparent'}
     >
       Rectangle
     </rect>

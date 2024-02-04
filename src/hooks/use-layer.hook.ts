@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 const useLayer = () => {
   const [layers, setLayers] = useState<Record<string, LayerProps>>({});
+  const [selection, setSelection] = useState<string[]>([]);
 
   const getLayersID = () => {
     const layersId = Object.keys(layers);
@@ -29,6 +30,8 @@ const useLayer = () => {
     getLayersID,
     getLayerById,
     addLayer,
+    selection,
+    setSelection,
   };
 };
 

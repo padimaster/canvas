@@ -12,7 +12,11 @@ import {
 } from '@/types';
 
 import useLayer from '@/hooks/use-layer.hook';
-import { pointerEventToCanvasPoint } from '@/lib/utils';
+import {
+  colorToCSS,
+  isSelectionMode,
+  pointerEventToCanvasPoint,
+} from '@/lib/utils';
 import { useCallback, useState } from 'react';
 import Info from './info.component';
 import { LayerPreview } from './layer';
@@ -26,14 +30,14 @@ export default function Canvas() {
     mode: CANVAS_MODE.NONE,
   });
 
-  const { layers, getLayersID, addLayer } = useLayer();
+  const { layers, getLayersID, addLayer, selection, setSelection } = useLayer();
 
   const layersId = getLayersID();
 
   const [camera, setCamera] = useState<Camera>({ x: 0, y: 0 });
   const [lastUsedColor, setLastUsedColor] = useState<Color>({
-    r: 0,
-    g: 0,
+    r: 10,
+    g: 100,
     b: 0,
   });
 
@@ -87,6 +91,38 @@ export default function Canvas() {
     }
   };
 
+  const layersToColors = (layerId: string) => {
+    if (!selection.includes(layerId) || !isSelectionMode(canvasState.mode)) {
+      return undefined;
+    }
+
+    return colorToCSS({ r: 150, g: 150, b: 150 });
+  };
+
+  const onLayerPointerDown = (e: React.PointerEvent, layerId: string) => {
+    if (
+      canvasState.mode === CANVAS_MODE.DRAWING ||
+      canvasState.mode === CANVAS_MODE.INSERTING
+    ) {
+      return;
+    }
+
+    e.stopPropagation();
+
+    const current = pointerEventToCanvasPoint(e, camera);
+
+    if (!selection.includes(layerId)) {
+      setSelection([layerId]);
+
+      setCanvasState({
+        mode: CANVAS_MODE.TRASLATING,
+        current,
+      });
+    } else {
+      setSelection((prev) => prev.filter((element) => element !== layerId));
+    }
+  };
+
   return (
     <div className="w-full h-full relative bg-neutral-100 touch-none">
       <Info />
@@ -116,8 +152,8 @@ export default function Canvas() {
               key={layerId}
               id={layerId}
               layer={layers[layerId]}
-              onLayerPointerDown={() => {}}
-              selectionColor={'#000'}
+              onLayerPointerDown={onLayerPointerDown}
+              selectionColor={layersToColors(layerId)}
             />
           ))}
         </g>
