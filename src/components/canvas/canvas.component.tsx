@@ -63,41 +63,10 @@ export default function Canvas() {
       fill: lastUsedColor,
     };
 
-    console.log('Before setLayers:', layers);
-
     setLayers((prevLayers) => ({
       ...prevLayers,
       [layerId]: layer,
     }));
-
-    console.log('After setLayers:', layers);
-  };
-
-  const onWheel = useCallback((e: React.WheelEvent) => {
-    setCamera((camera) => ({
-      x: camera.x - e.deltaX,
-      y: camera.y - e.deltaY,
-    }));
-  }, []);
-
-  const onPointerMove = (event: React.PointerEvent<SVGSVGElement>) => {
-    event.preventDefault();
-
-    const current = pointerEventToCanvasPoint(event, camera);
-
-    if (CANVAS_MODE.RESIZING) {
-      resizeSelectedLayer(current);
-    }
-  };
-
-  const onPointerUp: React.PointerEventHandler<SVGSVGElement> = (event) => {
-    const point = pointerEventToCanvasPoint(event, camera);
-    if (canvasState.mode === CANVAS_MODE.INSERTING) {
-      console.log('Inserting layer');
-      insertLayer(canvasState.layerType, point);
-    } else {
-      setCanvasState({ mode: CANVAS_MODE.NONE });
-    }
   };
 
   const layersToColors = (layerId: string) => {
@@ -120,16 +89,12 @@ export default function Canvas() {
 
     const current = pointerEventToCanvasPoint(e, camera);
 
-    if (!selection.includes(layerId)) {
-      setSelection([layerId]);
+    setSelection([layerId]);
 
-      setCanvasState({
-        mode: CANVAS_MODE.TRASLATING,
-        current,
-      });
-    } else {
-      setSelection((prev) => prev.filter((element) => element !== layerId));
-    }
+    setCanvasState({
+      mode: CANVAS_MODE.TRASLATING,
+      current,
+    });
   };
 
   const onResizeHandlerPointerDown = useCallback(
@@ -142,6 +107,12 @@ export default function Canvas() {
     },
     []
   );
+
+  const unselectLayers = () => {
+    if (selection.length > 0) {
+      setSelection([]);
+    }
+  };
 
   const resizeSelectedLayer = (point: Point) => {
     if (canvasState.mode !== CANVAS_MODE.RESIZING) {
@@ -167,6 +138,91 @@ export default function Canvas() {
         ...bounds,
       },
     }));
+  };
+
+  const translateSelectedLayers = (point: Point) => {
+    if (canvasState.mode !== CANVAS_MODE.TRASLATING) {
+      return;
+    }
+
+    const offset = {
+      x: point.x - canvasState.current.x,
+      y: point.y - canvasState.current.y,
+    };
+
+    for (const layerId of selection) {
+      const layer = layers[layerId];
+
+      if (!layer) {
+        continue;
+      }
+
+      setLayers((prevLayers) => ({
+        ...prevLayers,
+        [layerId]: {
+          ...layer,
+          x: layer.x + offset.x,
+          y: layer.y + offset.y,
+        },
+      }));
+    }
+
+    setCanvasState({
+      mode: CANVAS_MODE.TRASLATING,
+      current: point,
+    });
+  };
+  const onWheel = useCallback((e: React.WheelEvent) => {
+    setCamera((camera) => ({
+      x: camera.x - e.deltaX,
+      y: camera.y - e.deltaY,
+    }));
+  }, []);
+
+  const onPointerMove = (event: React.PointerEvent<SVGSVGElement>) => {
+    event.preventDefault();
+
+    const current = pointerEventToCanvasPoint(event, camera);
+
+    if (canvasState.mode === CANVAS_MODE.TRASLATING) {
+      translateSelectedLayers(current);
+    }
+
+    if (canvasState.mode === CANVAS_MODE.RESIZING) {
+      resizeSelectedLayer(current);
+    }
+  };
+
+  const onPointerUp: React.PointerEventHandler<SVGSVGElement> = (event) => {
+    const point = pointerEventToCanvasPoint(event, camera);
+
+    if (
+      canvasState.mode === CANVAS_MODE.NONE ||
+      canvasState.mode === CANVAS_MODE.PRESSING
+    ) {
+      console.log('Unselect');
+      unselectLayers();
+      setCanvasState({ mode: CANVAS_MODE.NONE });
+    } else if (canvasState.mode === CANVAS_MODE.INSERTING) {
+      console.log('Inserting layer');
+      insertLayer(canvasState.layerType, point);
+    } else {
+      setCanvasState({ mode: CANVAS_MODE.NONE });
+    }
+  };
+
+  const onPointerDown: React.PointerEventHandler<SVGSVGElement> = (event) => {
+    const point = pointerEventToCanvasPoint(event, camera);
+    if (canvasState.mode === CANVAS_MODE.INSERTING) {
+      return;
+    }
+
+    if (canvasState.mode === CANVAS_MODE.DRAWING) {
+      // TODO:
+      return;
+    }
+
+    setCanvasState({ mode: CANVAS_MODE.PRESSING, origin: point });
   };
 
   return (
