@@ -1,8 +1,9 @@
 'use client';
 
 import { LayersContext } from '@/providers/layer.provider';
-import { LAYER_TYPE, RectangleLayer } from '@/types';
+import { EllipseLayer, LAYER_TYPE, RectangleLayer } from '@/types';
 import { memo, useContext } from 'react';
+import Ellipse from './ellipse-layer.component';
 import Rectangle from './rectangle-layer.component';
 
 type Props = {
@@ -29,11 +30,25 @@ function LayerPreview({ id, onLayerPointerDown, selectionColor }: Props) {
         />
       );
     case LAYER_TYPE.ELLIPSE:
-      return null;
+      return (
+        <Ellipse
+          id={id}
+          layer={layer as EllipseLayer}
+          onPointerDown={onLayerPointerDown}
+          selectionColor={selectionColor}
+        />
+      );
     case LAYER_TYPE.TEXT:
       return null;
     case LAYER_TYPE.STICKY_NOTE:
-      return null;
+      return (
+        <Rectangle
+          id={id}
+          layer={layer as RectangleLayer}
+          onPointerDown={onLayerPointerDown}
+          selectionColor={selectionColor}
+        />
+      );
     default:
       console.warn('Unknown layer type');
       return null;
