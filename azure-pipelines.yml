@@ -3,10 +3,10 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-  - main
+- main
 
 resources:
-  - repo: self
+- repo: self
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -20,52 +20,53 @@ variables:
   webAppName: 'task-maker'
 
 stages:
-  - stage: Integration
-    displayName: Run tests and linter
-    jobs:
-      - job: LintAndTest
-      steps:
-      - task: UseNode@1
+- stage: Integration
+  displayName: 'Run tests and linter'
+  jobs:
+  - job: LintAndTest
+    steps:
+    - task: UseNode@1
       inputs:
         version: '18.x'
       displayName: 'Install Node.js'
 
-      - script: npm install -g pnpm
-      displayName: Installing pnpm
+    - script: 'npm install -g pnpm'
+      displayName: 'Installing pnpm'
 
-      - script: pnpm install
-      displayName: Installing packages
+    - script: 'pnpm install'
+      displayName: 'Installing packages'
       
-      - script: pnpm lint
-      displayName: Verifing code rules
+    - script: 'pnpm lint'
+      displayName: 'Verifying code rules'
 
-      - script: pnpm test
-      displayName: Running tests
+    - script: 'pnpm test'
+      displayName: 'Running tests'
 
-  - stage: Delivery
-    displayName: Build docker image and push to azure container registry
-    jobs:
-      - job: BuildAndPush
-        steps:
-          - task: Docker@2
-            inputs:
-              containerRegistry: '$(containerRegistry)'
-              repository: '$(dockerImage)'
-              command: 'buildAndPush'
-              Dockerfile: '$(dockerfilePath)'
-              tags: '$(tags)'
-  - stage: Deploy
-    displayName: Deploy docker image from azure container registry into Web App Services instance
-    jobs:
-      - job: Deploy
-        steps:
-          - task: AzureRmWebAppDeployment@4
-            inputs:
-              ConnectionType: 'AzureRM'
-              azureSubscription: 'Azure for Students(c82dd837-5e13-427c-b590-13569d8ac5f7)'
-              appType: 'webAppContainer'
-              WebAppName: '$(webAppName)'
-              DockerNamespace: '$(dockerNamespace)'
-              DockerRepository: '$(dockerImage)'
-              DockerImageTag: '$(tags)'
-              AppSettings: '-Port 3000'
+- stage: Delivery
+  displayName: 'Build docker image and push to azure container registry'
+  jobs:
+  - job: BuildAndPush
+    steps:
+    - task: Docker@2
+      inputs:
+        containerRegistry: '$(containerRegistry)'
+        repository: '$(dockerImage)'
+        command: 'buildAndPush'
+        Dockerfile: '$(dockerfilePath)'
+        tags: '$(tags)'
+
+- stage: Deploy
+  displayName: 'Deploy docker image from azure container registry into Web App Services instance'
+  jobs:
+  - job: Deploy
+    steps:
+    - task: AzureRmWebAppDeployment@4
+      inputs:
+        ConnectionType: 'AzureRM'
+        azureSubscription: 'Azure for Students(c82dd837-5e13-427c-b590-13569d8ac5f7)'
+        appType: 'webAppContainer'
+        WebAppName: '$(webAppName)'
+        DockerNamespace: '$(dockerNamespace)'
+        DockerRepository: '$(dockerImage)'
+        DockerImageTag: '$(tags)'
+        AppSettings: '-Port 3000'
