@@ -1,6 +1,5 @@
 import { colorToCSS, getSvgPathFromStroke } from '@/lib/utils';
 import { PathLayerProps } from '@/types';
-import '@testing-library/jest-dom';
 import getStroke from 'perfect-freehand';
 
 type Props = {
