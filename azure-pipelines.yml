@@ -20,10 +20,10 @@ variables:
   webAppName: 'task-maker'
 
 stages:
-- stage: Integration
+- stage: Build
   displayName: 'Run tests and linter'
   jobs:
-  - job: LintAndTest
+  - job: Build
     steps:
     - task: UseNode@1
       inputs:
@@ -35,9 +35,25 @@ stages:
 
     - script: 'pnpm install'
       displayName: 'Installing packages'
-      
+
     - script: 'pnpm lint'
-      displayName: 'Verifying code rules'
+      displayName: 'Running linter'
+
+    - script: 'pnpm build'
+      displayName: 'Building'
+  
+  - job: Test
+    steps:
+    - task: UseNode@1
+      inputs:
+        version: '18.x'
+      displayName: 'Install Node.js'
+
+    - script: 'npm install -g pnpm'
+      displayName: 'Installing pnpm'
+
+    - script: 'pnpm install'
+      displayName: 'Installing packages'
 
     - script: 'pnpm test'
       displayName: 'Running tests'
