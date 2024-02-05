@@ -34,8 +34,7 @@ export default function Ellipse({
       strokeWidth={1}
       fill={fill ? colorToCSS(fill) : '#000'}
       stroke={selectionColor || 'transparent'}
-    >
-      Rectangle
-    </ellipse>
+      data-testid={'ellipseLayerId'}
+    ></ellipse>
   );
 }

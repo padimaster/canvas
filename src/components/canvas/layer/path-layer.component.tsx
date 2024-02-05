@@ -1,5 +1,6 @@
 import { colorToCSS, getSvgPathFromStroke } from '@/lib/utils';
 import { PathLayerProps } from '@/types';
+import '@testing-library/jest-dom';
 import getStroke from 'perfect-freehand';
 
 type Props = {
@@ -36,6 +37,7 @@ export default function PathLayer({
       fill={fill ? colorToCSS(fill) : '#000'}
       stroke={selectionColor || '#000'}
       strokeWidth={1}
+      data-testid={'pathLayerId'}
     />
   );
 }

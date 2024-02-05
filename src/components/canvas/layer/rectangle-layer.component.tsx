@@ -32,6 +32,7 @@ export default function Rectangle({
       strokeWidth={1}
       fill={fill ? colorToCSS(fill) : '#000'}
       stroke={selectionColor || 'transparent'}
+      data-testid={'rectangleLayerId'}
     >
       Rectangle
     </rect>
