@@ -16,6 +16,7 @@ import {
 import {
   colorToCSS,
   isSelectionMode,
+  pencilPointsTuPathLayer,
   pointerEventToCanvasPoint,
   resizeBounds,
 } from '@/lib/utils';
@@ -36,6 +37,7 @@ export default function Canvas() {
 
   const [layers, setLayers] = useState<Record<string, any>>({});
   const [selection, setSelection] = useState<string[]>([]);
+  const [pencilDraft, setPencilDraft] = useState<Array<number[]>>([]);
 
   const layersId = Object.keys(layers);
 
@@ -173,6 +175,53 @@ export default function Canvas() {
       current: point,
     });
   };
+
+  const startDrawing = (point: Point, pressure: number) => {
+    const pencilDraft = [[point.x, point.y, pressure]];
+    setPencilDraft(pencilDraft);
+  };
+
+  const continueDrawing = (point: Point, event: React.PointerEvent) => {
+    if (
+      canvasState.mode !== CANVAS_MODE.DRAWING ||
+      !pencilDraft ||
+      event.buttons !== 1
+    ) {
+      return;
+    }
+
+    const isNotMoving =
+      pencilDraft.length === 0 &&
+      pencilDraft[0] &&
+      pencilDraft[0][0] === point.x &&
+      pencilDraft[0][1] === point.y;
+
+    if (!isNotMoving) {
+      setPencilDraft((prev) => [...prev, [point.x, point.y, event.pressure]]);
+    }
+  };
+
+  const insertPath = () => {
+    if (
+      pencilDraft === null ||
+      pencilDraft.length < 2 ||
+      layersId.length >= MAX_LAYERS
+    ) {
+      setPencilDraft([]);
+      return;
+    }
+
+    const id = nanoid();
+
+    setLayers((prev) => ({
+      ...prev,
+      [id]: pencilPointsTuPathLayer(pencilDraft, lastUsedColor),
+    }));
+
+    setPencilDraft([]);
+    setCanvasState({ mode: CANVAS_MODE.DRAWING });
+  };
+
   const onWheel = useCallback((e: React.WheelEvent) => {
     setCamera((camera) => ({
       x: camera.x - e.deltaX,
@@ -187,10 +236,10 @@ export default function Canvas() {
 
     if (canvasState.mode === CANVAS_MODE.TRASLATING) {
       translateSelectedLayers(current);
-    }
-
-    if (canvasState.mode === CANVAS_MODE.RESIZING) {
+    } else if (canvasState.mode === CANVAS_MODE.RESIZING) {
       resizeSelectedLayer(current);
+    } else if (canvasState.mode === CANVAS_MODE.DRAWING) {
+      continueDrawing(current, event);
     }
   };
 
@@ -201,11 +250,11 @@ export default function Canvas() {
       canvasState.mode === CANVAS_MODE.NONE ||
       canvasState.mode === CANVAS_MODE.PRESSING
     ) {
-      console.log('Unselect');
       unselectLayers();
       setCanvasState({ mode: CANVAS_MODE.NONE });
+    } else if (canvasState.mode === CANVAS_MODE.DRAWING) {
+      insertPath();
     } else if (canvasState.mode === CANVAS_MODE.INSERTING) {
-      console.log('Inserting layer');
       insertLayer(canvasState.layerType, point);
     } else {
       setCanvasState({ mode: CANVAS_MODE.NONE });
@@ -219,7 +268,7 @@ export default function Canvas() {
     }
 
     if (canvasState.mode === CANVAS_MODE.DRAWING) {
-      // TODO:
+      startDrawing(point, event.pressure);
       return;
     }
 
@@ -227,7 +276,16 @@ export default function Canvas() {
   };
 
   return (
-    <LayersProvider value={{ layers, setLayers, selection, setSelection }}>
+    <LayersProvider
+      value={{
+        layers,
+        setLayers,
+        selection,
+        setSelection,
+        penColor: lastUsedColor,
+        pencilDraft,
+      }}
+    >
       <div className="w-full h-full relative bg-neutral-100 touch-none">
         <Info />
         <Participants />
@@ -248,6 +306,7 @@ export default function Canvas() {
           onWheel={onWheel}
           onPointerUp={onPointerUp}
           onPointerMove={onPointerMove}
+          onPointerDown={onPointerDown}
           data-testid="layers-container"
         >
           <g

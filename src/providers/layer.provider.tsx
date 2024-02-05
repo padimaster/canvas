@@ -1,4 +1,4 @@
-import { LayerProps } from '@/types';
+import { Color, LayerProps } from '@/types';
 import React, { Dispatch, SetStateAction, createContext } from 'react';
 
 type LayersContextValue = {
@@ -6,6 +6,8 @@ type LayersContextValue = {
   selection: string[];
   setLayers: Dispatch<SetStateAction<Record<string, LayerProps>>>;
   setSelection: Dispatch<SetStateAction<string[]>>;
+  pencilDraft: Array<number[]>;
+  penColor: Color;
 };
 
 type LayersProviderProps = {
@@ -18,6 +20,8 @@ export const LayersContext = createContext<LayersContextValue>({
   selection: [],
   setLayers: () => {},
   setSelection: () => {},
+  pencilDraft: [],
+  penColor: { r: 0, g: 0, b: 0 },
 });
 
 export const LayersProvider: React.FC<LayersProviderProps> = ({
