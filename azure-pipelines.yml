@@ -20,6 +20,28 @@ variables:
   webAppName: 'task-maker'
 
 stages:
+  - stage: Integration
+    displayName: Run tests and linter
+    jobs:
+      - job: LintAndTest
+      steps:
+      - task: UseNode@1
+      inputs:
+        version: '18.x'
+      displayName: 'Install Node.js'
+
+      - script: npm install -g pnpm
+      displayName: Installing pnpm
+
+      - script: pnpm install
+      displayName: Installing packages
+      
+      - script: pnpm lint
+      displayName: Verifing code rules
+
+      - script: pnpm test
+      displayName: Running tests
+
   - stage: Delivery
     displayName: Build docker image and push to azure container registry
     jobs:
