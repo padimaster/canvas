@@ -65,7 +65,7 @@ We are using `Node v18 Hydrogen` and `pnpm` for this project so we set those val
 `.nvmrc`
 
 ```.nvmrc
-lts/iron
+lts/hydrogen
 ```
 
 `.npmrc`
