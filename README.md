@@ -286,7 +286,6 @@ This will ensure Husky gets installed automatically when other developers run th
 
 ```bash
 # Create .husky/pre-commit file
-pnpm test
 pnpm lint
 ```
 
@@ -301,3 +300,28 @@ pnpm build
 ```
 
 The above ensures that we are not allowed to push to the remote repository unless our code can successfully build.
+
+## 3. Update husky configuration for production environment
+Husky can not be installed in the production environment. Modify the following files accordingly:
+
+```javascript
+// Add .husky/install.mjs file
+
+// Skip Husky install in production and CI
+if (process.env.NODE_ENV === 'production' || process.env.CI === 'true') {
+    process.exit(0)
+  }
+  const husky = (await import('husky')).default
+  console.log(husky())
+```
+
+```json
+// Update package.json
+"scripts": {
+   ...
+   "prepare": "node .husky/install.mjs || true",
+   ...
+}
+```
+This modification ensures that Husky is excluded in production and CI environments, preventing any unintended interference.
+
